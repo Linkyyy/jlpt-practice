@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const levels = [
   { level: "N1", description: "挑战高阶词汇、复杂语法与深度阅读", tone: "bg-violet-600" },
   { level: "N2", description: "提升商务与日常场景中的综合理解力", tone: "bg-blue-600" },
@@ -77,12 +79,12 @@ export default function Home() {
                   </span>
                   <h3 className="mt-5 text-xl font-bold">JLPT {item.level}</h3>
                   <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{item.description}</p>
-                  <button
-                    type="button"
+                  <Link
+                    href={`/practice/setup?level=${item.level}`}
                     className="mt-5 w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
-                    开始练习
-                  </button>
+                    选择此等级
+                  </Link>
                 </article>
               ))}
             </div>
@@ -95,9 +97,9 @@ export default function Home() {
             </h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {practiceTypes.map((item) => (
-                <button
+                <Link
                   key={item.name}
-                  type="button"
+                  href={`/practice/setup?type=${encodeURIComponent(item.name)}`}
                   className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-indigo-200 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-lg font-bold text-indigo-700">
@@ -107,7 +109,7 @@ export default function Home() {
                     <span className="block font-bold text-slate-900">{item.name}</span>
                     <span className="mt-1 block text-sm text-slate-500">{item.description}</span>
                   </span>
-                </button>
+                </Link>
               ))}
             </div>
           </section>
