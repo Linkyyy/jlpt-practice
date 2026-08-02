@@ -184,6 +184,38 @@ type QuestionOverviewProps = {
 };
 
 function QuestionOverview({ questions, answers, currentIndex, onSelect }: QuestionOverviewProps) {
+  const overview = (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {questions.map((item, index) => {
+        const answer = answers.find((savedAnswer) => savedAnswer.questionId === item.id);
+        const answeredCorrectly = answer?.selectedOptionId === item.correctOptionId;
+        let statusStyle = "border-slate-300 bg-white text-slate-600 hover:border-indigo-400";
+        let statusLabel = "未作答";
+
+        if (answer) {
+          statusStyle = answeredCorrectly
+            ? "border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700"
+            : "border-rose-600 bg-rose-600 text-white hover:bg-rose-700";
+          statusLabel = answeredCorrectly ? "回答正确" : "回答错误";
+        }
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onSelect(index)}
+            aria-label={`第 ${index + 1} 题，题型 ${item.category}，${statusLabel}`}
+            aria-current={currentIndex === index ? "step" : undefined}
+            className={`flex min-w-20 flex-col items-center justify-center rounded-lg border px-3 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${statusStyle} ${currentIndex === index ? "ring-2 ring-indigo-500 ring-offset-2" : ""}`}
+          >
+            <span>第 {index + 1} 题</span>
+            <span className="mt-0.5 text-xs font-medium opacity-80">{item.category}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <nav className="mt-5 border-t border-slate-200 pt-5" aria-label="题目答题总览">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -194,34 +226,11 @@ function QuestionOverview({ questions, answers, currentIndex, onSelect }: Questi
           <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-slate-300" />未答</span>
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {questions.map((item, index) => {
-          const answer = answers.find((savedAnswer) => savedAnswer.questionId === item.id);
-          const answeredCorrectly = answer?.selectedOptionId === item.correctOptionId;
-          let statusStyle = "border-slate-300 bg-white text-slate-600 hover:border-indigo-400";
-          let statusLabel = "未作答";
-
-          if (answer) {
-            statusStyle = answeredCorrectly
-              ? "border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700"
-              : "border-rose-600 bg-rose-600 text-white hover:bg-rose-700";
-            statusLabel = answeredCorrectly ? "回答正确" : "回答错误";
-          }
-
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelect(index)}
-              aria-label={`第 ${index + 1} 题，${statusLabel}`}
-              aria-current={currentIndex === index ? "step" : undefined}
-              className={`flex size-10 items-center justify-center rounded-lg border text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${statusStyle} ${currentIndex === index ? "ring-2 ring-indigo-500 ring-offset-2" : ""}`}
-            >
-              {index + 1}
-            </button>
-          );
-        })}
-      </div>
+      <details className="mt-3 sm:hidden">
+        <summary className="cursor-pointer rounded-lg bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">展开题目预览</summary>
+        {overview}
+      </details>
+      <div className="hidden sm:block">{overview}</div>
     </nav>
   );
 }

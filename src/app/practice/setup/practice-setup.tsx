@@ -21,7 +21,7 @@ export function PracticeSetup() {
   const [year, setYear] = useState("2026");
   const [type, setType] = useState(types.some((item) => item.id === initialType) ? initialType! : "语法");
   const [mode, setMode] = useState<"full" | "single">("full");
-  const target = type === "阅读" ? "/practice/reading" : type === "听力" ? "/practice/listening" : "/practice";
+  const target = mode === "full" ? "/practice" : type === "阅读" ? "/practice/reading" : type === "听力" ? "/practice/listening" : "/practice";
   const query = `?level=${level}&year=${year}&type=${encodeURIComponent(type)}&mode=${mode}`;
 
   return (
@@ -37,23 +37,25 @@ export function PracticeSetup() {
           <ChoiceGroup title="2. 选择年份" values={years} selected={year} onSelect={setYear} suffix=" 年度模拟" />
 
           <fieldset>
-            <legend className="text-lg font-bold">3. 选择题型</legend>
+            <legend className="text-lg font-bold">3. 选择练习方式</legend>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              {types.map((item) => (
-                <button key={item.id} type="button" onClick={() => setType(item.id)} className={`rounded-xl border p-4 text-left transition ${type === item.id ? "border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600" : "border-slate-200 hover:border-indigo-300"}`}>
-                  <span className="font-bold">{item.id}</span><span className="mt-1 block text-sm text-slate-500">{item.description}</span>
-                </button>
-              ))}
+              <ModeButton active={mode === "full"} title="整份卷子" detail="按顺序完成全部题型" onClick={() => setMode("full")} />
+              <ModeButton active={mode === "single"} title="专项练习" detail={`集中练习一个题型`} onClick={() => setMode("single")} />
             </div>
           </fieldset>
 
-          <fieldset>
-            <legend className="text-lg font-bold">4. 选择练习方式</legend>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <ModeButton active={mode === "full"} title="整份卷子" detail="按顺序完成全部题型" onClick={() => setMode("full")} />
-              <ModeButton active={mode === "single"} title="单独题型" detail={`只练习${type}`} onClick={() => setMode("single")} />
-            </div>
-          </fieldset>
+          {mode === "single" && (
+            <fieldset>
+              <legend className="text-lg font-bold">4. 选择题型</legend>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {types.map((item) => (
+                  <button key={item.id} type="button" onClick={() => setType(item.id)} className={`rounded-xl border p-4 text-left transition ${type === item.id ? "border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600" : "border-slate-200 hover:border-indigo-300"}`}>
+                    <span className="font-bold">{item.id}</span><span className="mt-1 block text-sm text-slate-500">{item.description}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
 
           <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-slate-600"><strong className="text-slate-900">当前选择：</strong>{year} · {level} · {mode === "full" ? "整份卷子" : type}</p>
