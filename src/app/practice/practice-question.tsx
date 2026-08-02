@@ -78,7 +78,7 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
                 {question.level}
               </span>
               <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-700">
-                {question.category}
+                {question.year} · {question.section} · {question.category}
               </span>
             </div>
             <p className="text-sm font-semibold text-slate-600">
