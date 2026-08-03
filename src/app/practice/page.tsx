@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { PracticeQuestionCard } from "./practice-question";
-import { practiceQuestions } from "./questions";
+import { getPracticeQuestions } from "./questions";
 
-export default function PracticePage() {
+type PracticePageProps = {
+  searchParams: Promise<{ year?: string; level?: string; mode?: string; type?: string }>;
+};
+
+export default async function PracticePage({ searchParams }: PracticePageProps) {
+  const { year = "2026", level = "N1", mode = "full", type } = await searchParams;
+  const questions = getPracticeQuestions(year, level, mode, type);
+
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -22,7 +29,7 @@ export default function PracticePage() {
         </div>
       </header>
 
-      <PracticeQuestionCard questions={practiceQuestions} />
+      <PracticeQuestionCard questions={questions} />
     </div>
   );
 }
