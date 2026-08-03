@@ -6,6 +6,7 @@ export type PracticeQuestion = {
   year: string;
   section: "语言知识" | "阅读" | "听力";
   category: string;
+  passage?: string;
   prompt: string;
   options: PracticeOption[];
   correctOptionId: string;
@@ -55,6 +56,7 @@ const categoryInstructions: Record<PracticeQuestion["section"], string> = {
 function createQuestion(year: string, level: string, group: QuestionGroup, groupIndex: number, index: number): PracticeQuestion {
   const topics = yearTopics[year] ?? yearTopics["2026"];
   const topic = topics[(groupIndex + index) % topics.length];
+  const passageTopic = topics[groupIndex % topics.length];
   const serial = index + 1;
   const sectionLead = group.section === "语言知识"
     ? `${topic}についての案内は、参加者に分かりやすい表現で（　）必要がある。`
@@ -74,7 +76,12 @@ function createQuestion(year: string, level: string, group: QuestionGroup, group
     year,
     section: group.section,
     category: group.category,
-    prompt: `【${group.category} ${serial}】${sectionLead} ${categoryInstructions[group.section]}`,
+    passage: group.section === "阅读"
+      ? `${passageTopic}では、利用する人の声を定期的に集め、小さな改善を積み重ねている。担当者は、最初から大きな成果を求めるのではなく、実際の利用状況を確かめることが大切だと考えている。そのため、新しい方法を試した後も意見を聞き、必要に応じて計画を見直している。こうした取り組みは時間がかかるが、地域に合った仕組みを長く続けることにつながるという。`
+      : undefined,
+    prompt: group.section === "阅读"
+      ? `【${group.category} ${serial}】筆者が最も伝えたいことは何か。 ${categoryInstructions[group.section]}`
+      : `【${group.category} ${serial}】${sectionLead} ${categoryInstructions[group.section]}`,
     options: optionSets.map((text, optionIndex) => ({ id: String(optionIndex + 1), text })),
     correctOptionId: "1",
     explanation: `${year} 年度原创模拟卷的「${group.category}」题。根据题干信息，第一项最符合语境或内容。`,
