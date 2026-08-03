@@ -17,6 +17,8 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [showAnswerSheet, setShowAnswerSheet] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const question = questions[currentIndex];
   const currentAnswer = answers.find((answer) => answer.questionId === question.id);
@@ -49,12 +51,15 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
 
     setCurrentIndex(nextUnansweredIndex >= 0 ? nextUnansweredIndex : firstUnansweredIndex);
     setSelectedOptionId(null);
+    setIsPlaying(false);
   }
 
   function handleQuestionSelect(index: number) {
     const answer = answers.find((item) => item.questionId === questions[index].id);
     setCurrentIndex(index);
     setSelectedOptionId(answer?.selectedOptionId ?? null);
+    setShowAnswerSheet(false);
+    setIsPlaying(false);
   }
 
   function handleRestart() {
@@ -78,12 +83,15 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
                 {question.level}
               </span>
               <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-700">
-                {question.category}
+                {question.year} · {question.section} · {question.category}
               </span>
             </div>
-            <p className="text-sm font-semibold text-slate-600">
-              第 {currentIndex + 1} 题 / 共 {questions.length} 题
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-semibold text-slate-600">第 {currentIndex + 1} 题 / 共 {questions.length} 题</p>
+              <button type="button" onClick={() => setShowAnswerSheet(true)} className="rounded-full border border-slate-300 bg-slate-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                <span aria-hidden="true">▦</span> 答题卡
+              </button>
+            </div>
           </div>
 
           <div className="mt-5" aria-label={`答题进度 ${answers.length}/${questions.length}`}>
@@ -95,16 +103,37 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
               <div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${progress}%` }} />
             </div>
           </div>
-
-          <QuestionOverview
-            questions={questions}
-            answers={answers}
-            currentIndex={currentIndex}
-            onSelect={handleQuestionSelect}
-          />
         </div>
 
         <div className="px-5 py-6 sm:px-8 sm:py-8">
+          {question.passage && (
+            <article className="mb-7 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-5 sm:p-6" aria-labelledby="reading-passage-heading">
+              <p id="reading-passage-heading" className="text-sm font-bold tracking-wide text-indigo-700">阅读文章</p>
+              <p className="mt-3 whitespace-pre-line text-base leading-8 text-slate-800" lang="ja">{question.passage}</p>
+            </article>
+          )}
+          {question.section === "听力" && (
+            <section className="mb-7 overflow-hidden rounded-2xl bg-slate-900 p-5 text-white sm:p-6" aria-label="听力播放器">
+              <div className="flex items-center gap-4">
+                <button type="button" onClick={() => setIsPlaying((playing) => !playing)} aria-label={isPlaying ? "暂停" : "播放"} className="flex size-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-lg hover:bg-indigo-400">
+                  {isPlaying ? "Ⅱ" : "▶"}
+                </button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex justify-between gap-4 text-sm">
+                    <span className="truncate font-semibold">{question.category} · 第 {currentIndex + 1} 题</span>
+                    <span className="shrink-0 text-slate-400">00:00 / 00:42</span>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-700">
+                    <div className={`h-full rounded-full bg-indigo-400 transition-all duration-1000 ${isPlaying ? "w-2/5" : "w-0"}`} />
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-700 pt-4 text-xs text-slate-400">
+                <button type="button" onClick={() => setIsPlaying(false)} className="hover:text-white">↺ 重新播放</button>
+                <span>静态原创模拟音频 · 播放速度 1.0×</span>
+              </div>
+            </section>
+          )}
           <p className="text-sm font-bold tracking-wide text-indigo-600">请选择最合适的一项</p>
           <h1 className="mt-3 text-lg leading-8 font-bold text-slate-950 sm:text-xl sm:leading-9" lang="ja">
             {question.prompt}
@@ -172,6 +201,21 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
           </div>
         </div>
       </section>
+
+      {showAnswerSheet && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-0 sm:items-center sm:p-6" role="presentation" onMouseDown={() => setShowAnswerSheet(false)}>
+          <section role="dialog" aria-modal="true" aria-labelledby="answer-sheet-title" className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl sm:p-8" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
+              <div>
+                <p className="text-xs font-bold tracking-widest text-indigo-600">QUESTION SHEET</p>
+                <h2 id="answer-sheet-title" className="mt-1 text-2xl font-bold text-slate-950">答题卡</h2>
+              </div>
+              <button type="button" onClick={() => setShowAnswerSheet(false)} aria-label="关闭答题卡" className="flex size-10 items-center justify-center rounded-full bg-slate-100 text-xl text-slate-600 hover:bg-slate-200">×</button>
+            </div>
+            <QuestionOverview questions={questions} answers={answers} currentIndex={currentIndex} onSelect={handleQuestionSelect} />
+          </section>
+        </div>
+      )}
     </main>
   );
 }
@@ -184,8 +228,27 @@ type QuestionOverviewProps = {
 };
 
 function QuestionOverview({ questions, answers, currentIndex, onSelect }: QuestionOverviewProps) {
+  const sections = questions.reduce<Array<{ name: string; categories: Array<{ name: string; items: Array<{ question: PracticeQuestion; index: number }> }> }>>(
+    (result, question, index) => {
+      const sectionName = question.section === "语言知识" ? "文字词汇・语法" : question.section;
+      let section = result.find((item) => item.name === sectionName);
+      if (!section) {
+        section = { name: sectionName, categories: [] };
+        result.push(section);
+      }
+      let category = section.categories.find((item) => item.name === question.category);
+      if (!category) {
+        category = { name: question.category, items: [] };
+        section.categories.push(category);
+      }
+      category.items.push({ question, index });
+      return result;
+    },
+    [],
+  );
+
   return (
-    <nav className="mt-5 border-t border-slate-200 pt-5" aria-label="题目答题总览">
+    <nav className="mt-5" aria-label="题目答题总览">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-bold text-slate-700">题目答题总览</p>
         <div className="flex items-center gap-3 text-xs text-slate-500" aria-hidden="true">
@@ -194,8 +257,16 @@ function QuestionOverview({ questions, answers, currentIndex, onSelect }: Questi
           <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-slate-300" />未答</span>
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {questions.map((item, index) => {
+      <div className="mt-5 space-y-7">
+        {sections.map((section) => (
+          <section key={section.name} aria-labelledby={`answer-section-${section.name}`}>
+            <h3 id={`answer-section-${section.name}`} className="text-center text-lg font-bold text-slate-900">— {section.name} —</h3>
+            <div className="mt-4 space-y-4">
+              {section.categories.map((category) => (
+                <div key={category.name} className="grid gap-2 sm:grid-cols-[7rem_1fr] sm:items-start">
+                  <p className="pt-2 text-sm font-semibold text-slate-500">{category.name}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {category.items.map(({ question: item, index }) => {
           const answer = answers.find((savedAnswer) => savedAnswer.questionId === item.id);
           const answeredCorrectly = answer?.selectedOptionId === item.correctOptionId;
           let statusStyle = "border-slate-300 bg-white text-slate-600 hover:border-indigo-400";
@@ -220,7 +291,13 @@ function QuestionOverview({ questions, answers, currentIndex, onSelect }: Questi
               {index + 1}
             </button>
           );
-        })}
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </nav>
   );
