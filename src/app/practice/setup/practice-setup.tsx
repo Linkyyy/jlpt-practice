@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 const levels = ["N1", "N2", "N3", "N4", "N5"];
-const years = ["2026", "2025", "2024"];
+const years = ["2026"];
 const types = [
   { id: "文字・词汇", description: "汉字读音、词义与用法" },
   { id: "语法", description: "句型、助词与句子结构" },
@@ -30,11 +30,11 @@ export function PracticeSetup() {
         <Link href="/" className="text-sm font-semibold text-indigo-700">← 返回首页</Link>
         <p className="mt-8 text-sm font-bold tracking-widest text-indigo-600">PRACTICE SETUP</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">选择本次练习内容</h1>
-        <p className="mt-3 text-slate-600">选择等级、年份和练习方式，开始本次原创模拟练习。</p>
+        <p className="mt-3 text-slate-600">选择等级、题集和练习方式，开始本次原创模拟练习。</p>
 
         <div className="mt-8 space-y-7 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
           <ChoiceGroup title="1. 选择等级" values={levels} selected={level} onSelect={setLevel} />
-          <ChoiceGroup title="2. 选择年份" values={years} selected={year} onSelect={setYear} suffix=" 年度模拟" />
+          <ChoiceGroup title="2. 选择题集" values={years} selected={year} onSelect={setYear} suffix=" 原创模拟" />
 
           <fieldset>
             <legend className="text-lg font-bold">3. 选择练习方式</legend>

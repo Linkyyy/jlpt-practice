@@ -132,6 +132,12 @@ export function PracticeQuestionCard({ questions }: PracticeQuestionCardProps) {
                 <button type="button" onClick={() => setIsPlaying(false)} className="hover:text-white">↺ 重新播放</button>
                 <span>静态原创模拟音频 · 播放速度 1.0×</span>
               </div>
+              {question.audioTranscript && (
+                <details className="mt-4 border-t border-slate-700 pt-4 text-sm">
+                  <summary className="cursor-pointer font-semibold text-indigo-300">查看文字稿（静态原型）</summary>
+                  <p className="mt-3 leading-7 text-slate-300" lang="ja">{question.audioTranscript}</p>
+                </details>
+              )}
             </section>
           )}
           <p className="text-sm font-bold tracking-wide text-indigo-600">请选择最合适的一项</p>
